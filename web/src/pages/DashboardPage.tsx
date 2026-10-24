@@ -1,6 +1,6 @@
 import { useMemo, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
-import "./dashboard.css";
+import "../styles/dashboard.css";
 
 /* -------------------------------------------------------------------------
  * Point Pilot dashboard page
@@ -168,10 +168,10 @@ function PortfolioHeader({ accounts }: { accounts: BalanceAccount[] }) {
   const unvalued = accounts.filter((a) => a.cppCents == null).length;
 
   return (
-    <header className="pp-header">
+    <header className="point-pilot-header">
       <h1>Estimated portfolio value</h1>
-      <div className="pp-total">{usd(totalValue)}</div>
-      <p className="pp-sub">
+      <div className="point-pilot-total">{usd(totalValue)}</div>
+      <p className="point-pilot-sub">
         {nf.format(totalPoints)} points across {accounts.length}{" "}
         {accounts.length === 1 ? "program" : "programs"}
         {unvalued > 0 &&
@@ -184,11 +184,11 @@ function PortfolioHeader({ accounts }: { accounts: BalanceAccount[] }) {
 function AlertStrip({ alerts }: { alerts: DashboardAlert[] }) {
   if (alerts.length === 0) return null;
   return (
-    <section className="pp-alerts" aria-label="Alerts">
+    <section className="point-pilot-alerts" aria-label="Alerts">
       {alerts.map((a) => (
         <div
           key={a.id}
-          className={`pp-alert${a.kind === "expiration" ? " pp-exp" : ""}`}
+          className={`point-pilot-alert${a.kind === "expiration" ? " point-pilot-exp" : ""}`}
         >
           <b>{a.title}</b>
           <span>{a.detail}</span>
@@ -211,7 +211,7 @@ function Sparkline({ values }: { values: number[] }) {
 
   return (
     <svg
-      className="pp-spark"
+      className="point-pilot-spark"
       viewBox="0 0 300 32"
       preserveAspectRatio="none"
       aria-hidden="true"
@@ -244,25 +244,25 @@ function BalanceCard({
   const logId = `ledger-preview-${account.accountId}`;
 
   return (
-    <article className="pp-card">
+    <article className="point-pilot-card">
       <button
         type="button"
-        className="pp-card-btn"
+        className="point-pilot-card-btn"
         aria-expanded={open}
         aria-controls={logId}
         onClick={() => setOpen((o) => !o)}
       >
-        <span className="pp-top">
-          <span className="pp-name">{account.programName}</span>
-          <span className="pp-kind">{KIND_LABEL[account.kind]}</span>
+        <span className="point-pilot-top">
+          <span className="point-pilot-name">{account.programName}</span>
+          <span className="point-pilot-kind">{KIND_LABEL[account.kind]}</span>
         </span>
 
-        <span className="pp-pts">
+        <span className="point-pilot-pts">
           {nf.format(account.points)}
           <small>points</small>
         </span>
 
-        <span className="pp-val">
+        <span className="point-pilot-val">
           <span>{value == null ? "No value baseline set" : `About ${usd(value)}`}</span>
           {account.cppCents != null && (
             <span>{account.cppCents.toFixed(1)} cents each</span>
@@ -272,32 +272,32 @@ function BalanceCard({
         {history && <Sparkline values={history} />}
 
         {tag && (
-          <span className={`pp-tag${tag.warn ? " pp-warn" : ""}`}>{tag.text}</span>
+          <span className={`point-pilot-tag${tag.warn ? " point-pilot-warn" : ""}`}>{tag.text}</span>
         )}
-        {account.valueNote && <span className="pp-tag">{account.valueNote}</span>}
+        {account.valueNote && <span className="point-pilot-tag">{account.valueNote}</span>}
       </button>
 
-      <div id={logId} className="pp-log" hidden={!open}>
+      <div id={logId} className="point-pilot-log" hidden={!open}>
         {open && (
           <>
             {ledger.isPending && <p>Loading events…</p>}
             {ledger.isError && (
               <p role="alert">
                 Couldn't load events.{" "}
-                <button type="button" className="pp-link" onClick={() => ledger.refetch()}>
+                <button type="button" className="point-pilot-link" onClick={() => ledger.refetch()}>
                   Try again
                 </button>
               </p>
             )}
             {ledger.data?.length === 0 && <p>No events yet.</p>}
             {ledger.data?.map((e) => (
-              <div key={e.id} className="pp-event">
+              <div key={e.id} className="point-pilot-event">
                 <span>{shortDate(e.occurredAt)}</span>
                 <span>{signed(e.points)}</span>
                 <span>{e.note}</span>
               </div>
             ))}
-            <a className="pp-link" href={`/ledger?account_id=${account.accountId}`}>
+            <a className="point-pilot-link" href={`/ledger?account_id=${account.accountId}`}>
               View full ledger
             </a>
           </>
@@ -322,26 +322,26 @@ export default function DashboardPage() {
   let body: ReactNode;
   if (balances.isPending) {
     body = (
-      <div className="pp-state" aria-busy="true">
+      <div className="point-pilot-state" aria-busy="true">
         Loading balances…
       </div>
     );
   } else if (balances.isError) {
     body = (
-      <div className="pp-state" role="alert">
+      <div className="point-pilot-state" role="alert">
         <b>Couldn't load your balances.</b>
         <span>Check that the API is running, then try again.</span>
-        <button type="button" className="pp-link" onClick={() => balances.refetch()}>
+        <button type="button" className="point-pilot-link" onClick={() => balances.refetch()}>
           Try again
         </button>
       </div>
     );
   } else if (accounts.length === 0) {
     body = (
-      <div className="pp-state">
+      <div className="point-pilot-state">
         <b>No accounts yet.</b>
         <span>Add a program and enter its opening balance to get started.</span>
-        <a className="pp-link" href="/accounts/new">
+        <a className="point-pilot-link" href="/accounts/new">
           Add your first program
         </a>
       </div>
@@ -351,12 +351,12 @@ export default function DashboardPage() {
       <>
         <PortfolioHeader accounts={accounts} />
         <AlertStrip alerts={alerts.data ?? []} />
-        <section className="pp-grid" aria-label="Balance cards">
+        <section className="point-pilot-grid" aria-label="Balance cards">
           {accounts.map((a) => (
             <BalanceCard key={a.accountId} account={a} history={history.data?.[a.accountId]} />
           ))}
         </section>
-        <p className="pp-note">
+        <p className="point-pilot-note">
           {USE_SAMPLE && "Sample data. "}
           Values are points × your cents-per-point baseline, which you can edit in{" "}
           <a href="/settings">Settings</a>. Select a card to see its latest ledger events.
@@ -367,8 +367,8 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="pp">
-      <main className="pp-main">{body}</main>
+    <div className="point-pilot">
+      <main className="point-pilot-main">{body}</main>
     </div>
   );
 }
