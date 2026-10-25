@@ -1,0 +1,122 @@
+/* Color tokens are defined on :root in index.css; Hanken Grotesk is imported in main.tsx */
+.point-pilot {
+  color: var(--ink);
+  font-family: "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  line-height: 1.45;
+  min-height: 100vh;
+}
+.point-pilot *, .point-pilot *::before, .point-pilot *::after { box-sizing: border-box; }
+
+.point-pilot-main { max-width: 960px; margin: 0 auto; padding: 40px 20px 64px; }
+
+/* Portfolio header */
+.point-pilot-header { margin-bottom: 36px; }
+.point-pilot-header h1 { font-size: 1rem; font-weight: 500; color: var(--muted); margin: 0 0 6px; }
+.point-pilot-total {
+  font-size: clamp(2.4rem, 7vw, 3.6rem);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+.point-pilot-sub { color: var(--muted); font-size: 0.9rem; margin: 6px 0 0; }
+
+/* Alerts */
+.point-pilot-alerts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin: 0 0 28px;
+}
+.point-pilot-alert {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.point-pilot-alert b { font-weight: 500; color: var(--ink); font-size: 0.9rem; }
+.point-pilot-alert.point-pilot-exp { border-color: var(--warn); }
+.point-pilot-alert.point-pilot-exp b { color: var(--warn); }
+
+/* Card grid: cards separated by 1px hairlines */
+.point-pilot-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.point-pilot-card { background: var(--bg); }
+.point-pilot-card-btn {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  padding: 22px;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+.point-pilot-card-btn:hover { background: color-mix(in srgb, var(--ink) 3%, var(--bg)); }
+.point-pilot-card-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+.point-pilot-top { display: flex; justify-content: space-between; gap: 8px; font-size: 0.9rem; }
+.point-pilot-name { font-weight: 500; }
+.point-pilot-kind { color: var(--muted); }
+.point-pilot-pts { font-size: 2rem; font-weight: 500; letter-spacing: -0.02em; line-height: 1; }
+.point-pilot-pts small { font-size: 0.85rem; color: var(--muted); margin-left: 6px; letter-spacing: 0; }
+.point-pilot-val { display: flex; justify-content: space-between; font-size: 0.88rem; color: var(--muted); }
+.point-pilot-spark { width: 100%; height: 32px; color: var(--muted); }
+.point-pilot-tag { font-size: 0.85rem; color: var(--muted); }
+.point-pilot-tag.point-pilot-warn { color: var(--warn); font-weight: 500; }
+
+/* Expanded ledger preview */
+.point-pilot-log {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0 22px;
+  padding: 12px 0 18px;
+  border-top: 1px solid var(--line);
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+.point-pilot-log[hidden] { display: none; }
+.point-pilot-log p { margin: 0; }
+.point-pilot-event { display: grid; grid-template-columns: 52px 72px 1fr; gap: 8px; }
+
+.point-pilot-link {
+  align-self: flex-start;
+  padding: 0;
+  background: none;
+  border: 0;
+  font: inherit;
+  color: var(--ink);
+  text-decoration: underline;
+  cursor: pointer;
+}
+.point-pilot-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Loading, empty, error */
+.point-pilot-state {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 28px 22px;
+  color: var(--muted);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+.point-pilot-state b { color: var(--ink); font-weight: 500; }
+
+.point-pilot-note { color: var(--muted); font-size: 0.8rem; margin-top: 24px; }
+.point-pilot-note a { color: inherit; }
