@@ -2,6 +2,7 @@ from logging.config import fileConfig
 
 from sqlalchemy import create_engine
 from sqlalchemy import pool
+from sqlalchemy.engine import Connection
 
 from alembic import context
 
@@ -56,6 +57,13 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
+    # A caller such as pytest can hand over its own connection, e.g. to pointpilot_test.
+    # The caller owns that connection and commits it.
+    connection = config.attributes.get("connection")
+    if connection is not None:
+        do_run_migrations(connection)
+        return
+
     # Migrations connect as pointpilot_owner, not the app role, since they create tables.
     connectable = create_engine(
         settings.migration_database_url,
@@ -63,12 +71,16 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        do_run_migrations(connection)
 
-        with context.begin_transaction():
-            context.run_migrations()
+
+def do_run_migrations(connection: Connection) -> None:
+    context.configure(
+        connection=connection, target_metadata=target_metadata
+    )
+
+    with context.begin_transaction():
+        context.run_migrations()
 
 
 if context.is_offline_mode():
