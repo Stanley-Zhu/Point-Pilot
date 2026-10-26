@@ -11,6 +11,12 @@ dependencies = [
     "uvicorn[standard]>=0.54.0",
 ]
 
+[project.optional-dependencies]
+# Test and dev tools: pip install -e ".[dev]"
+dev = [
+    "pytest>=9.1.1",
+]
+
 [project.scripts]
 dev = "app.cli:dev"
 
