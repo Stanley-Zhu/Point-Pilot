@@ -16,5 +16,9 @@ class Settings(BaseSettings):
     # Alembic connects as pointpilot_owner, which owns the schema.
     migration_database_url: str
 
+    # Same two roles, pointed at pointpilot_test. Only pytest reads these, so the API starts without them.
+    test_database_url: str | None = None
+    test_migration_database_url: str | None = None
+
 
 settings = Settings()

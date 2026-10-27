@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/Point-Pilot.iml" filepath="$PROJECT_DIR$/.idea/Point-Pilot.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/point-pilot-api.iml" filepath="$PROJECT_DIR$/.idea/point-pilot-api.iml" />
+    </modules>
+  </component>
+</project>
