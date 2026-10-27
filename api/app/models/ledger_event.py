@@ -17,7 +17,7 @@ class LedgerEvent(Base):
             name="kind",
         ),
         CheckConstraint(
-            "source IN ('manual', 'csv', 'awardwallet', 'reconciliation')",
+            "source IN ('manual', 'csv', 'email', 'reconciliation')",
             name="source",
         ),
         CheckConstraint(

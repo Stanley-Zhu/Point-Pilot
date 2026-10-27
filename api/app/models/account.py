@@ -21,4 +21,3 @@ class Account(Base):
     member_ref: Mapped[str | None]
     status: Mapped[str] = mapped_column(server_default="active")
     expires_at: Mapped[date | None]
-    awardwallet_account_id: Mapped[str | None] = mapped_column(unique=True)

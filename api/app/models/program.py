@@ -9,7 +9,7 @@ from app.models.base import Base
 class Program(Base):
     __tablename__ = "programs"
     __table_args__ = (
-        CheckConstraint("kind IN ('bank', 'hotel', 'airline')", name="kind"),
+        CheckConstraint("kind IN ('bank', 'hotel', 'airline', 'other')", name="kind"),
     )
 
     id: Mapped[int] = mapped_column(Identity(), primary_key=True)

@@ -37,22 +37,20 @@ def upgrade() -> None:
     sa.Column('member_ref', sa.Text(), nullable=True),
     sa.Column('status', sa.Text(), server_default='active', nullable=False),
     sa.Column('expires_at', sa.Date(), nullable=True),
-    sa.Column('awardwallet_account_id', sa.Text(), nullable=True),
     sa.CheckConstraint("status IN ('active', 'closed')", name=op.f('ck_accounts_status')),
     sa.CheckConstraint('char_length(member_ref) <= 4', name=op.f('ck_accounts_member_ref_last_4')),
     sa.ForeignKeyConstraint(['program_id'], ['programs.id'], name=op.f('fk_accounts_program_id_programs')),
-    sa.PrimaryKeyConstraint('id', name=op.f('pk_accounts')),
-    sa.UniqueConstraint('awardwallet_account_id', name=op.f('uq_accounts_awardwallet_account_id'))
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_accounts'))
     )
     op.create_index(op.f('ix_accounts_program_id'), 'accounts', ['program_id'], unique=False)
     op.create_table('balance_snapshots',
     sa.Column('id', sa.BigInteger(), sa.Identity(always=False), nullable=False),
     sa.Column('account_id', sa.BigInteger(), nullable=False),
     sa.Column('points', sa.BigInteger(), nullable=False),
-    sa.Column('captured_at', sa.DateTime(timezone=True), nullable=False),
+    sa.Column('balance_as_of',sa.DateTime(timezone=True), nullable=False),
     sa.Column('source', sa.Text(), nullable=False),
     sa.Column('external_ref', sa.Text(), nullable=True),
-    sa.CheckConstraint("source IN ('manual', 'awardwallet')", name=op.f('ck_balance_snapshots_source')),
+    sa.CheckConstraint("source IN ('manual', 'email')", name=op.f('ck_balance_snapshots_source')),
     sa.CheckConstraint('points >= 0', name=op.f('ck_balance_snapshots_points_not_negative')),
     sa.ForeignKeyConstraint(['account_id'], ['accounts.id'], name=op.f('fk_balance_snapshots_account_id_accounts')),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_balance_snapshots'))
@@ -75,7 +73,7 @@ def upgrade() -> None:
     sa.CheckConstraint("(kind IN ('earn', 'transfer_in') AND points > 0) OR (kind IN ('burn', 'transfer_out', 'expire') AND points < 0) OR (kind IN ('adjust', 'reversal') AND points <> 0)", name=op.f('ck_ledger_events_sign_matches_kind')),
     sa.CheckConstraint("kind IN ('earn', 'burn', 'transfer_in', 'transfer_out', 'expire', 'adjust', 'reversal')", name=op.f('ck_ledger_events_kind')),
     sa.CheckConstraint("kind NOT IN ('transfer_in', 'transfer_out') OR transfer_group_id IS NOT NULL", name=op.f('ck_ledger_events_transfer_has_group')),
-    sa.CheckConstraint("source IN ('manual', 'csv', 'awardwallet', 'reconciliation')", name=op.f('ck_ledger_events_source')),
+    sa.CheckConstraint("source IN ('manual', 'csv', 'email', 'reconciliation')", name=op.f('ck_ledger_events_source')),
     sa.ForeignKeyConstraint(['account_id'], ['accounts.id'], name=op.f('fk_ledger_events_account_id_accounts')),
     sa.ForeignKeyConstraint(['reverses_event_id'], ['ledger_events.id'], name=op.f('fk_ledger_events_reverses_event_id_ledger_events')),
     sa.ForeignKeyConstraint(['snapshot_id'], ['balance_snapshots.id'], name=op.f('fk_ledger_events_snapshot_id_balance_snapshots')),
