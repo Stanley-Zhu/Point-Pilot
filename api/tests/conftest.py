@@ -6,9 +6,12 @@ from pathlib import Path
 import pytest
 from alembic import command
 from alembic.config import Config
+from fastapi.testclient import TestClient
 from sqlalchemy import Engine, create_engine
 from sqlalchemy.orm import Session
 
+from app.db import get_db
+from app.main import app
 from app.settings import settings
 
 # alembic.ini lives in api/, one folder up from tests/.
@@ -53,3 +56,12 @@ def db(app_engine: Engine) -> Iterator[Session]:
         yield session
         session.close()
         transaction.rollback()
+
+
+@pytest.fixture
+def client(db: Session) -> Iterator[TestClient]:
+    """The API, with every route's get_db swapped for the test's rolled-back session."""
+    app.dependency_overrides[get_db] = lambda: db
+    with TestClient(app) as test_client:
+        yield test_client
+    app.dependency_overrides.clear()

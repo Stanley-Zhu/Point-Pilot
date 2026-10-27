@@ -14,8 +14,8 @@ dependencies = [
 [project.optional-dependencies]
 # Test and dev tools: pip install -e ".[dev]"
 dev = [
-    # FastAPI's TestClient sends its requests through httpx.
-    "httpx>=0.28.1",
+    # FastAPI's TestClient sends its requests through httpx2 (Starlette 1.10+ deprecates httpx).
+    "httpx2>=2.16.0",
     "pytest>=9.1.1",
 ]
 
