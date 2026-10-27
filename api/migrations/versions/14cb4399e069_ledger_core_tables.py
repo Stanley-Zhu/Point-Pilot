@@ -84,11 +84,11 @@ def upgrade() -> None:
     op.create_index(op.f('ix_ledger_events_account_id'), 'ledger_events', ['account_id'], unique=False)
     # ### end Alembic commands ###
 
-    # The API connects as pointpilot_app. Programs and accounts are editable reference data,
+    # The API connects as pointpilot_admin. Programs and accounts are editable reference data,
     # but nothing deletes them: closing an account is a status change.
-    op.execute("GRANT SELECT, INSERT, UPDATE ON programs, accounts TO pointpilot_app")
+    op.execute("GRANT SELECT, INSERT, UPDATE ON programs, accounts TO pointpilot_admin")
     # Snapshots and ledger events are history: append-only, enforced in the database.
-    op.execute("GRANT SELECT, INSERT ON balance_snapshots, ledger_events TO pointpilot_app")
+    op.execute("GRANT SELECT, INSERT ON balance_snapshots, ledger_events TO pointpilot_admin")
 
 
 def downgrade() -> None:

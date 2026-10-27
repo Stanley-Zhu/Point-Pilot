@@ -37,7 +37,7 @@ def app_engine() -> Iterator[Engine]:
         command.upgrade(alembic_cfg, "head")
     owner_engine.dispose()
 
-    # Tests connect as pointpilot_app, so they run with the API's grants, not the owner's.
+    # Tests connect as pointpilot_admin, so they run with the API's grants, not the owner's.
     engine = create_engine(require_url(settings.test_database_url, "TEST_DATABASE_URL"))
     yield engine
     engine.dispose()

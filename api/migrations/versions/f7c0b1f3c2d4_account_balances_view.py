@@ -35,7 +35,7 @@ def upgrade() -> None:
         """
     )
     # A view has its own grants. Read-only, like everything derived from the ledger.
-    op.execute("GRANT SELECT ON account_balances TO pointpilot_app")
+    op.execute("GRANT SELECT ON account_balances TO pointpilot_admin")
 
     # Postgres cannot edit a CHECK expression in place, so drop it and add it back.
     # op.f() marks the name as final, so the naming convention is not applied twice.

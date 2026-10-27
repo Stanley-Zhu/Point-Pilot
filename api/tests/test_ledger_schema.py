@@ -1,4 +1,4 @@
-"""The ledger core tables, constraints, and grants, exercised as pointpilot_app."""
+"""The ledger core tables, constraints, and grants, exercised as pointpilot_admin."""
 
 import uuid
 from datetime import UTC, datetime
@@ -181,7 +181,7 @@ def test_app_role_cannot_change_history(db: Session, statement: Executable) -> N
 
 
 def balance_of(db: Session, account: Account) -> int:
-    """The account's row in the account_balances view, read as pointpilot_app."""
+    """The account's row in the account_balances view, read as pointpilot_admin."""
     db.flush()
     query = text("SELECT points FROM account_balances WHERE account_id = :account_id")
     return db.execute(query, {"account_id": account.id}).scalar_one()
