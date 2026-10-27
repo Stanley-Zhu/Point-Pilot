@@ -56,6 +56,12 @@ def test_app_role_can_insert_a_program(db: Session) -> None:
     assert program.id is not None
 
 
+@pytest.mark.parametrize("kind", ["bank", "hotel", "airline", "other"])
+def test_program_kind_accepts(db: Session, kind: str) -> None:
+    db.add(Program(name=f"{kind} program", kind=kind, currency_name="points"))
+    db.flush()
+
+
 def test_program_kind_must_be_known(db: Session) -> None:
     program = Program(name="Cruise Club", kind="cruise", currency_name="points")
     assert_rejected(db, program, "ck_programs_kind")
