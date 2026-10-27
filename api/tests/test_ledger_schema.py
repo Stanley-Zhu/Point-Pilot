@@ -5,7 +5,7 @@ from datetime import UTC, datetime
 
 import pytest
 from psycopg import errors
-from sqlalchemy import Executable, delete, update
+from sqlalchemy import Executable, delete, text, update
 from sqlalchemy.exc import IntegrityError, ProgrammingError
 from sqlalchemy.orm import Session
 
@@ -25,12 +25,13 @@ def account(db: Session) -> Account:
 
 def make_event(account: Account, **overrides: object) -> LedgerEvent:
     """A valid earn event; tests override only the fields they are checking."""
-    fields = {
+    fields: dict[str, object] = {
         "kind": "earn",
         "points": 1000,
         "occurred_at": datetime.now(UTC),
         "source": "manual",
-    } | overrides
+        **overrides,
+    }
     return LedgerEvent(account_id=account.id, **fields)
 
 
@@ -41,7 +42,10 @@ def assert_rejected(db: Session, row: object, constraint: str) -> None:
         with db.begin_nested():
             db.add(row)
             db.flush()
-    assert exc_info.value.orig.diag.constraint_name == constraint
+    # orig is the driver's own exception; narrow it so .diag is known to exist.
+    orig = exc_info.value.orig
+    assert isinstance(orig, errors.IntegrityError)
+    assert orig.diag.constraint_name == constraint
 
 
 def test_app_role_can_insert_a_program(db: Session) -> None:
@@ -50,6 +54,12 @@ def test_app_role_can_insert_a_program(db: Session) -> None:
     db.flush()
 
     assert program.id is not None
+
+
+@pytest.mark.parametrize("kind", ["bank", "hotel", "airline", "other"])
+def test_program_kind_accepts(db: Session, kind: str) -> None:
+    db.add(Program(name=f"{kind} program", kind=kind, currency_name="points"))
+    db.flush()
 
 
 def test_program_kind_must_be_known(db: Session) -> None:
@@ -168,3 +178,57 @@ def test_app_role_cannot_change_history(db: Session, statement: Executable) -> N
         with db.begin_nested():
             db.execute(statement)
     assert isinstance(exc_info.value.orig, errors.InsufficientPrivilege)
+
+
+def balance_of(db: Session, account: Account) -> int:
+    """The account's row in the account_balances view, read as pointpilot_app."""
+    db.flush()
+    query = text("SELECT points FROM account_balances WHERE account_id = :account_id")
+    return db.execute(query, {"account_id": account.id}).scalar_one()
+
+
+def test_balance_of_a_new_account_is_zero(db: Session, account: Account) -> None:
+    # LEFT JOIN: an account with no events still has a row.
+    assert balance_of(db, account) == 0
+
+
+def test_balance_is_the_sum_of_events(db: Session, account: Account) -> None:
+    db.add_all(
+        [
+            make_event(account, kind="earn", points=1000),
+            make_event(account, kind="burn", points=-300),
+            make_event(account, kind="adjust", points=50),
+        ]
+    )
+
+    balance = balance_of(db, account)
+
+    assert balance == 750
+    # The ::BIGINT cast: without it, SUM returns NUMERIC and this would be a Decimal.
+    assert type(balance) is int
+
+
+def test_reversal_cancels_its_event(db: Session, account: Account) -> None:
+    original = make_event(account, points=1000)
+    db.add(original)
+    db.flush()
+    db.add(make_event(account, kind="reversal", points=-1000, reverses_event_id=original.id))
+
+    assert balance_of(db, account) == 0
+
+
+def test_transfer_moves_points_between_accounts(db: Session, account: Account) -> None:
+    other = Account(program_id=account.program_id, member_ref="5678")
+    db.add(other)
+    db.flush()
+    group = uuid.uuid4()
+    db.add_all(
+        [
+            make_event(account, kind="earn", points=1000),
+            make_event(account, kind="transfer_out", points=-400, transfer_group_id=group),
+            make_event(other, kind="transfer_in", points=400, transfer_group_id=group),
+        ]
+    )
+
+    assert balance_of(db, account) == 600
+    assert balance_of(db, other) == 400

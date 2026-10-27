@@ -1,4 +1,4 @@
-"""FastAPI entrypoint. Run from api/ with: uv run uvicorn app.main:app --reload"""
+"""FastAPI entrypoint. Run from api/ with the venv active: dev (or uvicorn app.main:app --reload)"""
 
 from fastapi import FastAPI
 
