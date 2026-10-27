@@ -2,7 +2,10 @@
 
 from fastapi import FastAPI
 
+from app.routes import programs
+
 app = FastAPI(title="Point Pilot API")
+app.include_router(programs.router)
 
 
 @app.get("/health")

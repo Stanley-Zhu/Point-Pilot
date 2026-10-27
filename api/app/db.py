@@ -1,7 +1,9 @@
 """Database engine and the per-request session dependency."""
 
 from collections.abc import Iterator
+from typing import Annotated
 
+from fastapi import Depends
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
@@ -21,3 +23,7 @@ def get_db() -> Iterator[Session]:
     """
     with SessionLocal() as session:
         yield session
+
+
+# Route parameter type: `db: DbSession` asks FastAPI for a session from get_db.
+DbSession = Annotated[Session, Depends(get_db)]
